@@ -3,6 +3,7 @@ return array(
     'controllers' => array(
         'invokables' => array(
             'AlbumRest\Controller\AlbumRest' => 'AlbumRest\Controller\AlbumRestController',
+            'AlbumRest\Controller\UserRest' => 'AlbumRest\Controller\UserRestController',
         ),
     ),
 
@@ -21,8 +22,21 @@ return array(
                     ),
                 ),
             ),
+            'user-rest' => array(
+                'type'    => 'Segment',
+                'options' => array(
+                    'route'    => '/user-rest[/:id]',
+                    'constraints' => array(
+                        'id'     => '[0-9]+',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'AlbumRest\Controller\UserRest',
+                    ),
+                ),
+            ),
         ),
     ),
+
     'view_manager' => array(
         'strategies' => array(
             'ViewJsonStrategy',

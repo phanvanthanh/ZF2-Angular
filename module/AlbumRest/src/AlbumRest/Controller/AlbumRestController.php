@@ -3,11 +3,10 @@
 namespace AlbumRest\Controller;
 
 use Zend\Mvc\Controller\AbstractRestfulController;
-
-use Album\Model\Album as ModelAlbum;          // <-- Add this import
-use Album\Form\AlbumForm;       // <-- Add this import
+    
 use Zend\View\Model\JsonModel;
 use Album\Entity\Album;
+use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 
 class AlbumRestController extends AbstractRestfulController
 {
@@ -27,12 +26,16 @@ class AlbumRestController extends AbstractRestfulController
 
     public function getList()
     {
-        $results = $this->getAlbumTable()->fetchAll();
+        $entityManager=$this->getEntityManager();
+        $results=$entityManager->getRepository('Album\Entity\Album')->findAll();
+
         $data = array();
         foreach($results as $result) {
-            $data[] = $result;
+            $hydrator = new DoctrineHydrator($entityManager);
+            $dataArray = $hydrator->extract($result); // chuyển từ đối tượng sang mảng
+            $data[] = $dataArray;
         }
-
+        //die(var_dump($data));
         return new JsonModel(array(
             'data' => $data,
         ));
@@ -40,8 +43,10 @@ class AlbumRestController extends AbstractRestfulController
 
     public function get($id)
     {
-        $album = $this->getAlbumTable()->getAlbum($id);
-
+        $entityManager=$this->getEntityManager();
+        $result=$entityManager->getRepository('Album\Entity\Album')->find($id);
+        $hydrator = new DoctrineHydrator($entityManager);        
+        $album=$hydrator->extract($result);// chuyển từ đối tượng sang mảng
         return new JsonModel(array(
             'data' => $album,
         ));
@@ -50,13 +55,13 @@ class AlbumRestController extends AbstractRestfulController
     public function create($data)
     {
         $entityManager=$this->getEntityManager();
+        $hydrator = new DoctrineHydrator($entityManager);
         $album = new Album();
-        $album->setId('');
-        $album->setArtist($data['artist']);
-        $album->setTitle($data['title']);
+        $album = $hydrator->hydrate($data, $album); // chuyển mảng $data thành đối tượng album
+        
+        //lưu album
         $entityManager->persist($album);
         $entityManager->flush();
-        die(var_dump($album));
 
         $id=$album->getId();        
         return $this->get($id);
@@ -68,25 +73,18 @@ class AlbumRestController extends AbstractRestfulController
         $entityManager=$this->getEntityManager();
         $album=$entityManager->getRepository('Album\Entity\Album')->find($id);
         
-        die(var_dump($album));
         return $this->get($id);
     }
 
     public function delete($id)
     {
-        $this->getAlbumTable()->deleteAlbum($id);
+        $entityManager=$this->getEntityManager();
+        $album=$entityManager->getRepository('Album\Entity\Album')->find($id);
+        $entityManager->remove($album);
+        $entityManager->flush();
 
         return new JsonModel(array(
             'data' => 'deleted',
         ));
-    }
-
-    public function getAlbumTable()
-    {
-        if (!$this->albumTable) {
-            $sm = $this->getServiceLocator();
-            $this->albumTable = $sm->get('Album\Model\AlbumTable');
-        }
-        return $this->albumTable;
     }
 }

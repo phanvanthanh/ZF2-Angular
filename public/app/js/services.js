@@ -1,7 +1,7 @@
 (function () {
 	var as = angular.module('myApp.services', []);
-
-    as.service('i18n', function () {
+	
+    as.service('i18n', function ($rootScope) {
         var self = this;
         this.setLanguage = function (language) {
             $.i18n.properties({
@@ -14,8 +14,29 @@
                 }
             });
         };
-        this.setLanguage('en');
+        this.setLanguage('en');    
+        // $rootScope.appUrl = "http://localhost/ZF2+angular/public";    
     });
+ //    as.service('loginSv', function($http, $rootScope){
+	// 	this.login=function(user){
+	// 		var $promise=$http.post($rootScope.appUrl+'/user-rest',user);
+	// 		$promise.then(function(data){
+	// 			console.log(data.data.data);
+	// 			if(data.data.data==='succes'){
+	// 				console.log('Đăng nhập thành công');
+	// 			}
+	// 			else{
+	// 				console.log('Đăng nhập thất bại');
+	// 			}
+	// 		});
+	// 	};
+
+	// 	this.listUser=function(){
+	// 		console.log('tới đây');
+
+	// 	};
+
+	// });
 
 	as.service('base64', function () {
 		var keyStr = "ABCDEFGHIJKLMNOP" +
@@ -90,5 +111,6 @@
 			}
 		};
 	});
+	
 
 }());

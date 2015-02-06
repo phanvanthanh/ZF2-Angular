@@ -1,5 +1,7 @@
 (function() {
     var as = angular.module('myApp.controllers', []);
+    
+
     as.controller('AppCtrl', function($scope, $rootScope, $http, i18n, $location) {
         $scope.language = function() {
             return i18n.language;
@@ -26,8 +28,7 @@
 //            $scope.$emit('event:logoutRequest');
 //            $location.url('/');
 //        };
-
-        $rootScope.appUrl = "http://localhost/Zend/NhaSach/public";
+        $rootScope.appUrl = "http://localhost/ZF2+angular/public";
 
     });
 
@@ -73,11 +74,11 @@
             console.log('call saveAlbum');
             $http.post($rootScope.appUrl + '/album-rest', $scope.album)
                     .success(function(data, status, headers, config) {
-                        /*console.log('success...');
-                        $location.path('/album-rest');*/
+                        console.log('success...');
+                        $location.path('/albums');
                     })
                     .error(function(data, status, headers, config) {
-                         /*console.log('error...');*/
+                         console.log('error...');
                     });
         }
     });
